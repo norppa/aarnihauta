@@ -4,11 +4,11 @@
   "main": "index.js",
   "scripts": {
     "start": "node dist/index.js",
-    "dev": "nodemon src/index.ts",
+    "dev": "nodemon -r dotenv/config src/index.ts",
     "build:client": "npm run build --prefix ../client",
     "build:server": "tsc",
-    "build:clean": "if exist dist (rmdir /s /q dist)",
-    "build:pack": "xcopy /e /i ..\\clients\\web\\dist dist\\clients\\web && xcopy /e /i ..\\clients\\admin\\dist dist\\clients\\admin",
+    "build:clean": "rm -rf ./public",
+    "build:pack": "cp -r ../client/dist ./public",
     "build": "npm run build:clean && npm run build:fronts && npm run build:backend && npm run build:pack"
   },
   "keywords": [],
@@ -17,10 +17,13 @@
   "type": "commonjs",
   "description": "",
   "dependencies": {
-    "express": "^4.21.2"
+    "express": "^4.21.2",
+    "pg": "^8.13.3"
   },
   "devDependencies": {
     "@types/express": "^5.0.0",
+    "@types/pg": "^8.11.11",
+    "dotenv": "^16.4.7",
     "nodemon": "^3.1.9",
     "ts-node": "^10.9.2",
     "typescript": "^5.7.3"
