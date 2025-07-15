@@ -16,8 +16,6 @@ const port = Number(portString)
 const server = express()
 server.use(express.json())
 
-server.use(express.static('public'))
-
 const pool = new Pool({ host, port, database, user, password })
 
 server.get('/api/store', async (req: Request, res: Response) => {
