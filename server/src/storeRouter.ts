@@ -16,7 +16,7 @@ const pool = new Pool({ host, port, database, user, password })
 
 const router = express.Router()
 
-router.get('/api/store/:key', async (req: Request, res: Response) => {
+router.get('/:key', async (req: Request, res: Response) => {
   const key = req.params.key
   const queryText = 'SELECT value FROM entries WHERE key = $1'
   const queryValues = [key]
@@ -35,7 +35,7 @@ router.get('/api/store/:key', async (req: Request, res: Response) => {
   }
 })
 
-router.post('/api/store/:key', async (req: Request, res: Response) => {
+router.post('/:key', async (req: Request, res: Response) => {
   const key = req.params.key
   const value = req.body.value
   if (typeof value !== 'string') {
@@ -56,9 +56,9 @@ router.post('/api/store/:key', async (req: Request, res: Response) => {
   res.send()
 })
 
-router.delete('/api/store/:key', async (req: Request, res: Response) => {
+router.delete('/:key', async (req: Request, res: Response) => {
   const key = req.params.key
-  const queryText = 'DELETE FROM values WHERE key = $1'
+  const queryText = 'DELETE FROM entries WHERE key = $1'
   const queryValues = [key]
   try {
     const client = await pool.connect()
