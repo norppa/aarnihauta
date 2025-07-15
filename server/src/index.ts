@@ -20,33 +20,51 @@ server.use(express.static('public'))
 
 const pool = new Pool({ host, port, database, user, password })
 
-server.get('/api/values', async (req: Request, res: Response) => {
-  const queryText = 'SELECT * FROM values'
+server.get('/api/store', async (req: Request, res: Response) => {
+  const queryText = 'SELECT key, value FROM entries'
   const client = await pool.connect()
   const result = await client.query(queryText)
   client.release()
   res.send(result.rows)
 })
 
-server.post('/api/values', async (req: Request, res: Response) => {
-  console.log(req.body)
-  const queryText = 'INSERT INTO values (value) VALUES ($1) RETURNING *'
-  const queryValues = [req.body.value]
-  console.log(queryValues)
-  const client = await pool.connect()
-  const result = await client.query(queryText, queryValues)
-  client.release()
-  res.send(result.rows)
+server.post('/api/store', async (req: Request, res: Response) => {
+  const { key, value } = req.body
+  if (key === undefined || value === undefined) {
+    res.status(400).send('Key and value are required')
+    return
+  }
+  if (typeof key !== 'string' || typeof value !== 'string') {
+    res.status(400).send('Key and value must be strings')
+    return
+  }
+  const queryText = 'INSERT INTO entries (key, value) VALUES ($1, $2)'
+  const queryValues = [key, value]
+  try {
+    const client = await pool.connect()
+    await client.query(queryText, queryValues)
+    client.release()
+  } catch (error) {
+    res.status(400).send('Value already exists or database error')
+    return
+  }
+  res.send()
 })
 
-server.delete('/api/values', async (req: Request, res: Response) => {
-  const queryText = 'DELETE FROM values'
+server.delete('/api/store', async (req: Request, res: Response) => {
+  const { key } = req.body
+  if (typeof key !== 'string' || key === undefined) {
+    res.status(400).send('Key must be a string')
+    return
+  }
+  const queryText = 'DELETE FROM values WHERE key = $1'
+  const queryValues = [key]
   const client = await pool.connect()
-  const result = await client.query(queryText)
+  await client.query(queryText, queryValues)
   client.release()
   res.send()
 })
 
 server.listen(serverPortString, () => {
-  console.log(`Aarnihauta Server is running on http://localhost:${serverPortString}`)
+  console.log(`Aarnihauta Server @ ${port}`)
 })
