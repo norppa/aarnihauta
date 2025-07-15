@@ -1,9 +1,10 @@
 import 'dotenv/config'
 import express, { Request, Response } from 'express'
+import cors from 'cors'
 import storeRouter from './storeRouter'
 
-
 const server = express()
+server.use(cors())
 server.use(express.json())
 
 server.use('/api/store', storeRouter)
